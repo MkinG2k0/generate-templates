@@ -1,14 +1,34 @@
 {
   "templates": {
-    "NestedFolder": {
-      "template": "templates/NestedFolder",
-      "generate": "./test-generated/NestedFolder",
-      "replace": "/fileName/ig"
-    },
     "comp": {
       "template": "templates/comp",
-      "generate": "./test-generated/Components"
+      "generate": "generated/Components",
+      "replaceName": "fileName"
+    },
+    "page": {
+      "template": "templates/page",
+      "generate": "generated/Pages/"
+    },
+    "page-comp": {
+      "template": "templates/page",
+      "generate": "generated/Pages/*/Components"
+    },
+    "slice": {
+      "template": "templates/slice",
+      "generate": "generated/Redux/Slices/",
+      "replaceExt": [
+        [
+          "txt",
+          "ts"
+        ]
+      ]
     }
   },
-  "register": true
+  "replaceName": "FileName",
+  "replaceNameExt": [
+    [
+      "FileName.txt",
+      "tsx"
+    ]
+  ]
 }

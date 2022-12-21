@@ -27,9 +27,22 @@ export interface Global {
   register?: boolean
   template?: string
   generate?: string
+  replaceNameExt?: [string, string][]
+  replaceExt?: [string, string][]
 }
 
 export interface FileData extends path.ParsedPath {
   data?: string
   fullPath: string
+}
+
+interface DataPath {
+  name: string
+  isFile: boolean
+  dir?: DataPath[]
+}
+
+export interface GenStructure {
+  path: string
+  files: string[]
 }

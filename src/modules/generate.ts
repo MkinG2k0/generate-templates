@@ -1,10 +1,10 @@
 // import fs from 'fs-extra'
-import fs from 'node:fs/promises'
-import fsx from 'fs-extra'
-import * as path from 'path'
-import { warn, error, success } from './logs.js'
-import { FileData, TemplateItem, Config, Arguments, Init, Global } from '../interface/Generate.js'
 import dirTree from 'directory-tree'
+import fsx from 'fs-extra'
+import fs from 'node:fs/promises'
+import * as path from 'path'
+import { Arguments, Config, GenStructure, Global, Init, TemplateItem } from '../interface/Generate.js'
+import { error, success } from './logs.js'
 
 export class Generate {
   args: Init = {
@@ -21,7 +21,9 @@ export class Generate {
     template: '',
     generate: '',
   }
-  globalConfig: Global = {}
+  configTemplate: Global = {
+    replaceName: '/FileName/gi',
+  }
 
   tree: dirTree.DirectoryTree<any> | undefined
 
@@ -30,8 +32,9 @@ export class Generate {
     this.parseJson()
   }
 
+  // Парсинг generate.json
   async parseJson() {
-    const {pathConfig} = this.args
+    const { pathConfig } = this.args
     const infoConfig = path.parse(pathConfig)
 
     // TODO ignore js ts file
@@ -57,44 +60,70 @@ export class Generate {
     }
   }
 
+  genStructure(fileNames: string[]) {
+    const genStructure: GenStructure[] = []
+
+    fileNames.map((name) => {
+      if (name.includes('./')) {
+        genStructure.push({ path: name, files: [] })
+      } else {
+        genStructure.at(-1)?.files.push(name)
+      }
+    })
+
+    return genStructure
+  }
+
+  // Чтение generate.json
   readTemplate() {
     const templateName = this.args.templateName
 
     // если нашли указанный templateName в generate.json
-    this.globalConfig = {...this.config, ...this.config?.templates?.[templateName]}
+    const localConfig = this.config?.templates?.[templateName]
+    const globalConfig = { ...this.config, templates: undefined }
+    this.configTemplate = { ...globalConfig, ...localConfig }
 
-    // console.log( this.globalConfig.template)
-
-    if (this.globalConfig.template) {
-      this.readTemplateFile(this.globalConfig.template)
+    if (this.configTemplate.template) {
+      this.readTemplateFile(this.configTemplate.template)
     } else {
       error(`Template name "${templateName}" is not found, review your generate.json`)
     }
   }
 
+  // Чтение файлов из generate
   async readTemplateFile(currPath) {
-    this.tree = dirTree(currPath, {attributes: ['type']})
+    this.tree = dirTree(currPath, { attributes: ['type'] })
 
     if (this.tree) {
       const files = this.args.files
-      files.map((value) => this.read(this.tree, value))
+      const filesStructure = this.genStructure(files)
+
+      if (filesStructure.length > 0) {
+        filesStructure.map(({ files, path }) => {
+          files.map((value) => this.read(this.tree, value, path))
+        })
+      } else {
+        files.map((value) => this.read(this.tree, value))
+      }
     } else {
       error(`Check template file in "${currPath}"`)
     }
   }
 
-  async read(data: dirTree.DirectoryTree<any> | undefined, replaceName: string) {
+  // Чтение структуры из dirTree
+  async read(data: dirTree.DirectoryTree<any> | undefined, replaceName: string, relativePath?: string) {
     for await (const value of data?.children || []) {
       // Записываем файл
-      await this.write(value, replaceName)
+      await this.write(value, replaceName, relativePath)
       // Читаем
-      await this.read(value, replaceName)
+      await this.read(value, replaceName, relativePath)
     }
   }
 
-  async write(treeFile: dirTree.DirectoryTree<any>, replaceName: string) {
-    const {type} = treeFile
-    const newPath = this.replacePath(treeFile.path, replaceName)
+  // Запись файлов из template
+  async write(treeFile: dirTree.DirectoryTree<any>, replaceName: string, relativePath?: string) {
+    const { type } = treeFile
+    const newPath = this.replacePath(treeFile.path, replaceName, relativePath)
 
     if (type === 'directory') {
       await fsx.ensureDir(newPath)
@@ -109,36 +138,53 @@ export class Generate {
     success(`Created in ${newPath}`)
   }
 
-  replacePath(pathTempFile: string, replaceName) {
-    const genPath = this.globalConfig.generate || ''
-    const tempName = this.args.templateName
+  // Генерация пути для сгенерированных файлов
+  replacePath(pathTempFile: string, replaceName, relativePath?: string) {
+    const splitPath = this.configTemplate.generate?.split('*')
+    const startPath = splitPath?.[0] || ''
+    const endPath = splitPath?.[1] || ''
+    const genPath = path.join(startPath, relativePath || '/', endPath)
+
+    const lastNameFolder = this.configTemplate.template?.split('/').at(-1)
     const splitPth = pathTempFile.split('\\')
-    const findIndexPath = splitPth.findIndex((data) => data === tempName)
+    //
+    const findIndexPath = splitPth.findIndex((data) => data === lastNameFolder)
+
     const slicePath = splitPth.slice(findIndexPath + 1).map((value) => this.refactorName(value, replaceName))
     const newPath = path.join(genPath, replaceName, ...slicePath)
 
-    console.log(newPath)
     return newPath
   }
 
+  // Манипуляции с заменой символов в имени файла
   refactorName(name, replaceName: string) {
-    return name.replace(this.globalConfig.replaceName!, replaceName)
+    const parseName = path.parse(name)
+    const replaceExtNames = this.configTemplate.replaceNameExt?.find(([fileName, ext]) => name === fileName)
+    const replaceExt = this.configTemplate.replaceExt?.find(
+      ([replaceExt, currExt]) => parseName.ext === `.${replaceExt}`,
+    )
+
+    let replacedName = parseName.name.replace(this.configTemplate.replaceName!, replaceName)
+
+    if (replaceExtNames) {
+      replacedName = replacedName.concat(`.${replaceExtNames[1]}`)
+    } else {
+      const currExt = replaceExt ? `.${replaceExt[1]}` : parseName.ext
+      replacedName = replacedName.concat(currExt)
+    }
+
+    return replacedName
   }
 
+  // Замена слова FileName внутри файла
   async refactorData(data: string, replaceName) {
-    const register = this.globalConfig.register ? 'g' : ''
-
-    const regExpName = new RegExp(this.globalConfig.replaceName || '', `i${register}`)
-
+    const configReplaceName = this.configTemplate.replaceName!
+    // Проверка если в заменяемом имени есть "/" то значит что это RegExp формат если его нет то мы делаем его сами
+    const regExpName = configReplaceName.includes('/') ? configReplaceName : new RegExp(configReplaceName || '', 'ig')
     const replacedData = data.replace(regExpName, replaceName)
+
     return replacedData
   }
-}
-
-interface DataPath {
-  name: string
-  isFile: boolean
-  dir?: DataPath[]
 }
 
 // await fs.readdir(currPath, (err, fileNames) => {

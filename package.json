@@ -12,11 +12,15 @@
   "scripts": {
     "dev": "npx nodemon",
     "build": "rimraf ./build && npx tsc",
-    "test-config-generate-json": "npm run build && node build/main config/generate.json NestedFolder NewName TwoName TripleName",
-    "g:nested": "npm run build && node build/main config/generate.json NestedFolder ",
-    "config-generate-js": "npm run build && node build/main generate.js ",
-    "lint": "npx eslint ./src",
-    "format": "npx eslint ./src --fix"
+    "start": "npm run build && node build/main ",
+    "test-g:comp": "npm run start config/generate.json comp MainComp DoubleComp",
+    "test-g:page": "npm run start config/generate.json page Main Auth",
+    "test-g:page-comp": "npm run start config/generate.json page-comp ./Main Form",
+    "test-g:slice": "npm run start config/generate.json slice Auth Product",
+    "g:comp": "npm run start config/generate.json comp",
+    "g:page": "npm run start config/generate.json page",
+    "g:pc": "npm run start config/generate.json page-comp",
+    "g:slice": "npm run start config/generate.json slice"
   },
   "keywords": [],
   "author": "",
