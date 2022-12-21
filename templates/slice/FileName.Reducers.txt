@@ -1,0 +1,9 @@
+import { PayloadAction } from '@reduxjs/toolkit'
+
+import { FileNameModel } from 'templates/slice/FileName.Model.txt'
+
+export const reducers = {
+	setFileName(state: FileNameModel, action: PayloadAction<string>) {
+		state.data.data = action.payload
+	},
+}

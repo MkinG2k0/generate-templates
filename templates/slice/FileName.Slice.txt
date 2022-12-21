@@ -1,0 +1,16 @@
+import { createSlice } from '@reduxjs/toolkit'
+
+import { extraReducers } from 'templates/slice/FileName.ExReducers.txt'
+import { initialState } from 'templates/slice/FileName.Init.txt'
+import { reducers } from 'templates/slice/FileName.Reducers.txt'
+
+const slice = createSlice({
+	name: 'FileName',
+	initialState,
+	reducers,
+	extraReducers,
+})
+
+export const { setFileName } = slice.actions
+
+export const FileName = slice.reducer

@@ -1,0 +1,14 @@
+{
+  "templates": {
+    "NestedFolder": {
+      "template": "templates/NestedFolder",
+      "generate": "./test-generated/NestedFolder",
+      "replace": "/fileName/ig"
+    },
+    "comp": {
+      "template": "templates/comp",
+      "generate": "./test-generated/Components"
+    }
+  },
+  "register": true
+}
