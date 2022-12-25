@@ -22,19 +22,21 @@ export class Generate {
     generate: '',
   }
   configTemplate: Global = {
-    replaceName: '/FileName/gi',
+    replaceName: 'FileName',
   }
 
   tree: dirTree.DirectoryTree<any> | undefined
 
   constructor(args: Arguments) {
     this.args = args
+
     this.parseJson()
   }
 
   // Парсинг generate.json
   async parseJson() {
     const { pathConfig } = this.args
+
     const infoConfig = path.parse(pathConfig)
 
     // TODO ignore js ts file
@@ -81,7 +83,7 @@ export class Generate {
     // если нашли указанный templateName в generate.json
     const localConfig = this.config?.templates?.[templateName]
     const globalConfig = { ...this.config, templates: undefined }
-    this.configTemplate = { ...globalConfig, ...localConfig }
+    this.configTemplate = { ...this.configTemplate, ...globalConfig, ...localConfig }
 
     if (this.configTemplate.template) {
       this.readTemplateFile(this.configTemplate.template)
@@ -135,7 +137,7 @@ export class Generate {
       await fsx.outputFile(newPath, dataRefactor)
     }
 
-    success(`Created in ${newPath}`)
+    success(`Created in "${newPath}"`)
   }
 
   // Генерация пути для сгенерированных файлов
@@ -172,7 +174,6 @@ export class Generate {
       const currExt = replaceExt ? `.${replaceExt[1]}` : parseName.ext
       replacedName = replacedName.concat(currExt)
     }
-
     return replacedName
   }
 
@@ -186,22 +187,3 @@ export class Generate {
     return replacedData
   }
 }
-
-// await fs.readdir(currPath, (err, fileNames) => {
-//   // Массив путей до файлов templates/test/*
-//   fileNames.map((nameTemplate) => {
-//     // Создание пути нового файла на основе имени файла и пути который указан в примере
-//     const newFilePath = path.join(currPath, nameTemplate)
-//     const pathData = path.parse(newFilePath)
-//     pathFiles.push({ ...pathData, fullPath: newFilePath })
-//   })
-// })
-//
-// pathFiles.map((dataFile, index) => {
-//   // Читаем данные по пути fullPath
-//   fs.readFile(dataFile.fullPath, { encoding: 'utf-8' }, async (err, data) => {
-//     // Записываем данные
-//
-//     await this.write({ ...dataFile, data: data.toString() })
-//   })
-// })

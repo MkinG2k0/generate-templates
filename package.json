@@ -1,18 +1,42 @@
 {
-  "name": "typescript-2023",
-  "version": "1.0.0",
+  "name": "generate-templates",
+  "version": "1.0.1",
   "description": "",
-  "main": "index.js",
+  "main": "./build/bin/main.js",
   "type": "module",
+  "private": false,
+  "contributors": [
+    {
+      "name": "Mut Kama",
+      "email": "kamai122000@mail.ru"
+    }
+  ],
+  "keywords": [
+    "generate",
+    "template",
+    "script",
+    "library",
+    "ts",
+    "js"
+  ],
   "husky": {
     "hooks": {
       "pre-commit": "npm run lint"
     }
   },
+  "exports": {
+    ".": {
+      "import": "./build/bin/main.js",
+      "require": "./build/bin/main.js"
+    }
+  },
+  "bin": {
+    "gen-template": "./build/bin/main.js"
+  },
   "scripts": {
     "dev": "npx nodemon",
     "build": "rimraf ./build && npx tsc",
-    "start": "npm run build && node build/main ",
+    "start": "npm run build && node build/bin/main.js ",
     "test-g:comp": "npm run start config/generate.json comp MainComp DoubleComp",
     "test-g:page": "npm run start config/generate.json page Main Auth",
     "test-g:page-comp": "npm run start config/generate.json page-comp ./Main Form",
@@ -22,7 +46,6 @@
     "g:pc": "npm run start config/generate.json page-comp",
     "g:slice": "npm run start config/generate.json slice"
   },
-  "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {

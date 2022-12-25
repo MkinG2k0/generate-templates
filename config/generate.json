@@ -1,13 +1,12 @@
 {
   "templates": {
-    "comp": {
-      "template": "templates/comp",
-      "generate": "generated/Components",
-      "replaceName": "fileName"
-    },
     "page": {
       "template": "templates/page",
       "generate": "generated/Pages/"
+    },
+    "comp": {
+      "template": "templates/comp",
+      "generate": "generated/Components"
     },
     "page-comp": {
       "template": "templates/page",
@@ -24,7 +23,6 @@
       ]
     }
   },
-  "replaceName": "FileName",
   "replaceNameExt": [
     [
       "FileName.txt",

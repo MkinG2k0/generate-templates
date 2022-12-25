@@ -6,5 +6,5 @@
   "ignore": [
     "./src/test"
   ],
-  "exec": "npx ts-node ./src/main.ts config/generate.json NestedFolder NewName "
+  "exec": "npx ts-node ./src/main.ts config/generate.json "
 }

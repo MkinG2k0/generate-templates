@@ -6,7 +6,7 @@
       "ES2021"
     ],
     "module": "NodeNext",
-    "rootDir": "./src",
+    "rootDir": "./",
     "resolveJsonModule": true,
     "allowJs": true,
     "sourceMap": true,
@@ -19,7 +19,7 @@
     "skipLibCheck": true
   },
   "include": [
-    "src/**/*",
+    "bin/**/*"
   ],
   "exclude": [
     "node_modules",

@@ -1,5 +1,101 @@
-# Полная настройка Node.js с TypeScript в 2023
+## Example config
 
-[Пошаговая инструкция к репозиторию](https://vladilen.notion.site/Node-js-TypeScript-2023-d08eba5fe4eb43fa8687ce7755a53bf0)
+```json 
+{
+  "templates": {
+    "comp": {
+      "template": "templates/comp",
+      "generate": "generated/Components"
+    }
+  }
+}
 
-[Видео на Youtube](https://youtu.be/w2n5HkUNEv4)
+```
+
+## Template structure
+
+```
+~/Root Directory
+│
+├─ src
+│   ├─ Components
+│   │  └── AnyComponent
+│   │      └─ AnyComponent.tsx 
+│   │
+│   └ index.ts
+│
+└── templates
+    └── comp
+        ├─ FileName.tsx
+        └─ FileName.module.scss
+    
+```
+
+## Data in FileName.tsx
+
+```tsx
+import { FC } from 'react'
+
+import style from './FileName.module.scss'
+
+interface FileNameProps {
+}
+
+export const FileName: FC<FileNameProps> = ({}) => {
+	return <div className={style.wrap}>TemplateName</div>
+}
+```
+
+After running the script, "FileName" will be replaced with what you specified in the script as an argument (
+TestComponents)
+
+## Script
+
+```npm
+npx gen-template config/generate.json comp TestComponents
+```
+
+### After script run
+
+### Components
+
+```tsx
+import { FC } from 'react'
+
+import style from './FileName.module.scss'
+
+interface TestComponentsProps {
+}
+
+export const TestComponents: FC<TestComponentsProps> = ({}) => {
+	return <div className={style.wrap}>TestComponents</div>
+}
+```
+
+### Directory
+
+```
+~/Root Directory
+│
+├─ src
+│   ├─ Components
+│   │  ├─ AnyComponent
+│   │  │   └─ AnyComponent.tsx 
+│   │  └─ TestComponents
+│   │     ├─ TestComponents.tsx
+│   │     └─ TestComponents.module.scss
+│   │
+│   └ index.ts
+│
+└── templates
+    └── comp
+        ├─ FileName.tsx
+        └─ FileName.module.scss
+    
+```
+
+## You can generate multiple files at once
+
+```npm
+npx gen-template config/generate.json comp TestComponents AnotherComponent
+```
