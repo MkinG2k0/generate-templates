@@ -23,6 +23,7 @@
       ]
     }
   },
+  "replaceName": "FileName",
   "replaceNameExt": [
     [
       "FileName.txt",

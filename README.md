@@ -1,3 +1,5 @@
+Link to  [git-hub](https://github.com/MkinG2k0/generate-templates)
+
 ## Example config
 
 ```json 
