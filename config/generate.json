@@ -24,10 +24,17 @@
     }
   },
   "replaceName": "FileName",
+  "replaceExt": [
+    [
+      "txt",
+      "tsx"
+    ]
+  ],
   "replaceNameExt": [
     [
       "FileName.txt",
       "tsx"
     ]
-  ]
+  ],
+  "debug": true
 }

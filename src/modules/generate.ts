@@ -4,7 +4,7 @@ import fsx from 'fs-extra'
 import fs from 'node:fs/promises'
 import * as path from 'path'
 import { Arguments, Config, GenStructure, Global, Init, TemplateItem } from '../interface/Generate.js'
-import { error, success } from './logs.js'
+import { error, Log, success } from './logs-class.js'
 
 export class Generate {
   args: Init = {
@@ -24,6 +24,7 @@ export class Generate {
   configTemplate: Global = {
     replaceName: 'FileName',
   }
+  logs: Log | undefined
 
   tree: dirTree.DirectoryTree<any> | undefined
 
@@ -84,6 +85,8 @@ export class Generate {
     const localConfig = this.config?.templates?.[templateName]
     const globalConfig = { ...this.config, templates: undefined }
     this.configTemplate = { ...this.configTemplate, ...globalConfig, ...localConfig }
+
+    this.logs = new Log(this.configTemplate.debug)
 
     if (this.configTemplate.template) {
       this.readTemplateFile(this.configTemplate.template)

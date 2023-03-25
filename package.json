@@ -1,6 +1,6 @@
 {
   "name": "generate-templates",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "description": "",
   "main": "./build/bin/main.js",
   "type": "module",
@@ -41,7 +41,7 @@
     "test-g:page": "npm run start config/generate.json page Main Auth",
     "test-g:page-comp": "npm run start config/generate.json page-comp ./Main Form",
     "test-g:slice": "npm run start config/generate.json slice Auth Product",
-    "g:comp": "npm run start config/generate.json comp",
+    "g:comp": "npm run start config/generate.json comp Test",
     "g:page": "npm run start config/generate.json page",
     "g:pc": "npm run start config/generate.json page-comp",
     "g:slice": "npm run start config/generate.json slice"

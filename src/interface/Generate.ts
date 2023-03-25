@@ -29,6 +29,7 @@ export interface Global {
   generate?: string
   replaceNameExt?: [string, string][]
   replaceExt?: [string, string][]
+  debug?: boolean
 }
 
 export interface FileData extends path.ParsedPath {

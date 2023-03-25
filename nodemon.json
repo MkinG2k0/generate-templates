@@ -6,5 +6,6 @@
   "ignore": [
     "./src/test"
   ],
-  "exec": "npx ts-node ./src/main.ts config/generate.json "
+  "exec": "npx ts-node ./bin/main.ts ./templates config/generate.json --debug  /absPath ./relativePath Name AnotherName"
 }
+
