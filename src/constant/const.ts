@@ -1,2 +1,2 @@
-export const FILE_NAME = '{name}'
-export const DATA_NAME = 'fileName'
+export const FILE_NAME = '${name}'
+export const DATA_NAME = '${name}'

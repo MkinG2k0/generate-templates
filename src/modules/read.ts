@@ -4,11 +4,8 @@ import { Config } from './config-class.js'
 import { log } from './logs-class.js'
 import { Reader } from './reader-class.js'
 
-type TMidlware = (data: TemplateItem) => void
-
 export class ReadTemplates {
   private currentTemplate?: TemplateItem
-  private data: TemplateItem[] = []
 
   constructor(public config: Config) {}
 
@@ -19,7 +16,7 @@ export class ReadTemplates {
 
     const find = this.config.args.typeTemplate.map(async (type) => {
       // Достаем по имени темлейта объект из конфига
-      this.currentTemplate = this.config.generateConfig?.templates[type]
+      this.currentTemplate = this.config.globalConfig?.templates?.[type]
       // Если нашли объект то значит что темлейт найден
       if (this.currentTemplate) {
         // Инициализируем темлейт
@@ -33,17 +30,13 @@ export class ReadTemplates {
     return Promise.all(find)
   }
 
-  async initTemplate(config: TemplateItem) {
-    // Путь до файлов теплейте
+  private async initTemplate(config: TemplateItem) {
+    // Путь до файлов в теплейте
     const pathToTemplate = nodePath.join(this.config.pathRun, config.template)
     // Существует ли файл
     const isExists = await Reader.isExists(pathToTemplate)
 
     if (isExists) {
-      // Если файл найден, то его читаем
-      // const generateTemplate = new GenerateTemplate(this.config)
-      // await generateTemplate.read(pathToTemplate)
-      this.data.push(config)
       return config
     } else {
       // В противном случае бросаем ошибку

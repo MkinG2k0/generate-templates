@@ -81,6 +81,7 @@ export class Reader implements TReader {
 
     if (!isExist) {
       console.error(`Not found path "${this.path}"`)
+      return this.data
     }
     await this.readData(this.data, this.path)
     return this.data

@@ -8,7 +8,8 @@ exports[`ReadTemplates class > ReadTemplates args 1`] = `
     "template": "templates/page",
   },
   {
-    "generate": "generated/Components",
+    "generate": "generated/Components/",
+    "replaceDataName": /FileName/g,
     "template": "templates/comp",
   },
 ]

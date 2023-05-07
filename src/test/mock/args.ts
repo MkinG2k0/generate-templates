@@ -4,4 +4,5 @@ export const mockArgs =
   )
 
 export const realArgs = '_node _path /config/config.js page comp name: Main Auth '.split(' ')
+export const realTestArgs = '_node _path /config/config.js test name: NewName '.split(' ')
 export const failedArgs = '_node _path /another_path/config.js page comp name: Main Auth '.split(' ')

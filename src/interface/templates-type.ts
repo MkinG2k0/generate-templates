@@ -7,7 +7,7 @@ export interface Arguments {
 }
 
 export interface IConfig extends Global {
-  templates: Record<string, TemplateItem>
+  templates?: Record<string, TemplateItem>
 }
 
 export interface Init {

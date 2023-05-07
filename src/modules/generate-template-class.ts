@@ -1,17 +1,22 @@
 import fs from 'node:fs/promises'
 import nodePath from 'path'
-import { DATA_NAME, FILE_NAME } from '../constant/const.js'
-import { IConfig, TemplateItem } from '../interface/templates-type.js'
+import { TemplateItem } from '../interface/templates-type.js'
 import { Config } from '../modules/config-class.js'
-import { Case } from './case-class.js'
+import { Arg } from './arg-class.js'
+import { GenerateData } from './generate-data.js'
 import { log } from './logs-class.js'
 import { Reader, TData } from './reader-class.js'
 
 export class GenerateTemplate {
-  private currentTemplate?: TemplateItem
   private countIterate = 0
+  private generateData?: GenerateData
 
   constructor(public config: Config) {}
+
+  setGenerateData(arg: Arg) {
+    // Создаем класс для генерации имени и данных на основе глобального конфига
+    this.generateData = new GenerateData(this.config, arg)
+  }
 
   async write(template: TemplateItem) {
     // Рекурсивно читаем все файлы и папки, по путю до темлейта
@@ -19,17 +24,19 @@ export class GenerateTemplate {
     // Ждем чтения всех файлов
     const generateData = await reader.read()
 
-    // Если файлы есть
+    // Если файлов нет
     if (!generateData) return
 
     // Читаем все имена файлов из агрументов
     const writeDataArr = this.config.args?.fileName.map(async (name) => {
+      // записываем локальный конфиг для генерации имени и данных
+      this.generateData?.setLocalConfig(template)
       // очищаем счетчик итераций
       this.clearCountIterate()
       // Записываем данные на основе имени в аргументах
       const generatePath = nodePath.join(this.config.pathRun, template.generate)
       // записали все данные
-      log.success(generatePath)
+      log.success(`${name}: ${generatePath}`)
       return this.writeData(generateData, generatePath, name)
     })
 
@@ -38,23 +45,20 @@ export class GenerateTemplate {
     return true
   }
 
-  // Чтение всех имен файлов в аргументах
-  writeNames(call: (name: string) => Promise<any>) {
-    return this.config.args?.fileName.map(call)
-  }
-
-  async writeData(writeData: TData, generatePath: string, generateName: string) {
+  private async writeData(writeData: TData, generatePath: string, generateName: string) {
     const { type } = writeData
     // увеличиваем счетчик итераций
     this.incCountIterate()
     // генерируем новое имя файла или паки
-    const newName = this.replaceName(writeData, generateName)
+    const newName = this.generateData!.replaceName(writeData, generateName)
 
     if (type === 'file') {
       const newPath = nodePath.join(generatePath, newName)
 
       await this.createFile(writeData, newPath, generateName)
     } else {
+      // TODO сделать чтобы эту опцию можно было выбирать в конфиге
+      // TODO заменять ли выбраным именем корневую папку генерации
       // если это первая итерация, то название папки будет соответствовать имени в конфиге
       const newPath = nodePath.join(generatePath, this.countIterate === 1 ? generateName : newName)
 
@@ -68,68 +72,28 @@ export class GenerateTemplate {
     }
   }
 
-  clearCountIterate() {
+  private clearCountIterate() {
     this.countIterate = 0
   }
 
-  incCountIterate() {
+  private incCountIterate() {
     this.countIterate++
   }
 
-  replaceName(data: TData, generateName: string) {
-    const { ext, type, name } = data
-    if (type === 'file') {
-      // ищем в локальном или в глобальном конфиге на что заменять расширения
-      const isReplaceExt = this.getLocalOrGlobalConfig((conf) => conf.replaceExt)
-      // ищем какое имя файла заменить если не нашли используем константу
-      const replaceFileName = this.getLocalOrGlobalConfig((conf) => conf.replaceFileName) || FILE_NAME
-
-      const replacedName = name.replace(replaceFileName, generateName)
-      // если расширение в конфиге совпадаем с текущим файлом
-      const findReplacedExt = isReplaceExt?.find(([replaceable, replace]) => {
-        return replaceable === ext
-      })
-      // если нашли расширение, прибавляем его к названию файла,
-      // в противном случае прибавляем расширение прочитанного файла template
-      const fileName = findReplacedExt ? `${replacedName}.${findReplacedExt[1]}` : `${replacedName}.${ext}`
-      return fileName
-    }
-    return data.name
-  }
-
-  async createFolder(path: string) {
+  private async createFolder(path: string) {
     await fs.mkdir(path).catch((reason) => {
       // log.warn(`Error create folder in path "${path}"`).view(reason)
     })
   }
 
-  async createFile(data: TData, path: string, generateName: string) {
+  private async createFile(data: TData, path: string, generateName: string) {
     if (data.type === 'file') {
-      const replacedData = this.replaceDataFile(data, generateName)
+      const replacedData = this.generateData!.replaceDataFile(data, generateName)
 
       await fs.writeFile(path, replacedData).catch((reason) => {
         log.error(`Error create file in path ${data.path}`)
         // .view(reason)
       })
     }
-  }
-
-  replaceDataFile(data: TData, name: string) {
-    if (data.type === 'file') {
-      // Переводим имя файла в camelCase для использования в файлах
-      const dataName = Case.toCamel(name)
-      // ищем какую строку заменить внутри файла если не нашли используем константу
-      const replaceDataName = this.getLocalOrGlobalConfig((conf) => conf.replaceDataName) || DATA_NAME
-      // заменяем данные внутри файла
-      const replacedData = data.data.replaceAll(replaceDataName, dataName)
-      return replacedData
-    }
-    return ''
-  }
-
-  getLocalOrGlobalConfig<T>(call: (data: TemplateItem | IConfig) => T | undefined): T | undefined {
-    const currentData = call(this.currentTemplate || { templates: {} })
-    const globalData = call(this.config.generateConfig || { templates: {} })
-    return typeof currentData !== 'undefined' ? currentData : globalData
   }
 }
