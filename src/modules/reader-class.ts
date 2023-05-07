@@ -3,6 +3,7 @@ import node_path from 'path'
 
 interface TReaderParams {
   isRecursive?: boolean
+  path?: string
 }
 
 type TPath = string
@@ -12,15 +13,18 @@ type TDataType = 'file' | 'folder'
 interface IStructure<T extends TDataType, Data> {
   name: string
   path: string
+  ext: string
   type: T
   data: Data
 }
 
-interface IFile extends IStructure<'file', string> {}
+export interface IFile extends IStructure<'file', string> {
+  fileName: string
+}
 
-interface IFolder extends IStructure<'folder', TData[]> {}
+export interface IFolder extends IStructure<'folder', TData[]> {}
 
-type TData = IFile | IFolder
+export type TData = IFile | IFolder
 
 type TDataArr = TData | TData[]
 
@@ -40,43 +44,50 @@ export class Reader implements TReader {
     name: '',
     type: 'folder',
     path: '',
+    ext: '',
     data: [],
   }
   private iteration: number = 0
-  private callBacks: TCall[] = []
 
   constructor(public path: string, public params?: TReaderParams) {
-    this.init().then(() => {
-      this.callFunc()
-    })
+    this.path = params?.path ? node_path.join(params.path, path) : path
   }
 
-  onFinish(call: TCall | any) {
-    this.callBacks.push(call)
+  static async isExists(path: string) {
+    return await fs
+      .access(path)
+      .then(() => {
+        return true
+      })
+      .catch(() => {
+        return false
+      })
   }
 
-  private callFunc() {
-    this.callBacks.map((func) => func(this.data))
+  async readFile(path: string) {
+    return await fs.readFile(path)
   }
 
-  private async init() {
-    const isExist = await this.isExists(this.path)
+  async readDir(path: string) {
+    return await fs.readdir(path)
+  }
 
-    if (isExist) {
-      await this.read(this.data, this.path)
-    } else {
+  async isFile(path: string) {
+    return (await fs.lstat(path)).isFile()
+  }
+
+  async read(): Promise<TData | undefined> {
+    const isExist = await Reader.isExists(this.path)
+
+    if (!isExist) {
       console.error(`Not found path "${this.path}"`)
     }
+    await this.readData(this.data, this.path)
+    return this.data
   }
 
-  private async read(data, path: string) {
+  private async readData(data, path: string) {
     const isFile = await this.isFile(path)
-
-    if (!this.params?.isRecursive && this.iteration > 0) {
-      return
-    }
-
-    this.iteration += 1
 
     if (isFile) {
       const dataFile = await this.readFile(path)
@@ -89,15 +100,19 @@ export class Reader implements TReader {
   }
 
   private async mapFolders(data: TData | any, path: string) {
+    if (!this.params?.isRecursive && this.iteration > 0) {
+      return
+    }
+
+    this.iteration += 1
+
     const folders = await this.readDir(path)
     const arrPromise = folders.map(async (name) => {
-      const relativePath = './'.concat(node_path.join(path, name))
+      const relativePath = node_path.join(path, name)
 
-      // data.data[name] = {}
-      // await this.read(data.data[name], relativePath)
       const obj = {}
       data.data.push(obj)
-      await this.read(obj, relativePath)
+      await this.readData(obj, relativePath)
     })
     await Promise.all(arrPromise)
   }
@@ -105,36 +120,13 @@ export class Reader implements TReader {
   private createData(obj: TData, path: string, type: TDataType, data: string | TData[]) {
     const { name, ext } = node_path.parse(path)
 
-    obj.name = name.concat(ext)
     obj.type = type
+    obj.name = name
+    obj.ext = ext.slice(1)
     obj.path = path
     obj.data = data
-  }
-
-  private async readFile(path: string) {
-    return await fs.readFile(path)
-  }
-
-  private async readDir(path: string) {
-    return await fs.readdir(path)
-  }
-
-  private async isFile(path: string) {
-    return (await fs.lstat(path)).isFile()
-  }
-
-  private async isExists(path: string) {
-    let exist: boolean = false
-
-    await fs
-      .access(path)
-      .then(() => {
-        exist = true
-      })
-      .catch(() => {
-        exist = false
-      })
-
-    return exist
+    if (obj.type === 'file') {
+      obj.fileName = name.concat(ext)
+    }
   }
 }

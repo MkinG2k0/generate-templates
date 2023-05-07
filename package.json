@@ -35,16 +35,19 @@
   },
   "scripts": {
     "dev": "npx nodemon",
+    "test": "vitest",
+    "test:u": "vitest -u",
     "build": "rimraf ./build && npx tsc",
-    "start": "npm run build && node build/bin/main.js ",
-    "test-g:comp": "npm run start config/generate.json comp MainComp DoubleComp",
-    "test-g:page": "npm run start config/generate.json page Main Auth",
-    "test-g:page-comp": "npm run start config/generate.json page-comp ./Main Form",
-    "test-g:slice": "npm run start config/generate.json slice Auth Product",
-    "g:comp": "npm run start config/generate.json comp Test",
-    "g:page": "npm run start config/generate.json page",
-    "g:pc": "npm run start config/generate.json page-comp",
-    "g:slice": "npm run start config/generate.json slice"
+    "start": "npm run build && node build/bin/main.js /config/config.js ",
+    "start:page": "npm run start page name: MyPage",
+    "test-g:comp": "npm run start config/config.json comp MainComp DoubleComp",
+    "test-g:page": "npm run start config/config.json page Main Auth",
+    "test-g:page-comp": "npm run start config/config.json page-comp ./Main Form",
+    "test-g:slice": "npm run start config/config.json slice Auth Product",
+    "g:comp": "npm run start config/config.json comp Test",
+    "g:page": "npm run start config/config.json page",
+    "g:pc": "npm run start config/config.json page-comp",
+    "g:slice": "npm run start config/config.json slice"
   },
   "author": "",
   "license": "ISC",
@@ -62,8 +65,11 @@
     "typescript": "^4.9.3"
   },
   "dependencies": {
+    "@types/jest": "^29.5.1",
     "chalk": "^5.2.0",
     "directory-tree": "^3.4.0",
-    "fs-extra": "^11.1.0"
+    "fs-extra": "^11.1.0",
+    "vite": "^4.3.5",
+    "vitest": "^0.31.0"
   }
 }

@@ -1,6 +1,7 @@
 export interface Arguments {
   pathConfig: string
-  replaceName?: string
+  replaceFileName?: string
+  replaceDataName?: string
   templateName: string
   files: string[]
 }
@@ -21,28 +22,11 @@ export interface TemplateItem extends Global {
 }
 
 export interface Global {
-  replaceName?: string
-  register?: boolean
-  template?: string
-  generate?: string
+  replaceFileName?: string // global replace name "FileName"
+  replaceDataName?: string // global replace data name "FileName"
+  template?: string // path to template
+  generate?: string // path to generate
   replaceNameExt?: [string, string][] // заменить расширение по имени файла
   replaceExt?: [string, string][] // заменить расширение
   debug?: boolean
-}
-
-// export interface FileData extends path.ParsedPath {
-//   data?: string
-//   fullPath: string
-// }
-
-// interface DataPath {
-//   name: string
-//   isFile: boolean
-//   dir?: DataPath[]
-// }
-
-//
-export interface GenStructure {
-  path: string
-  files: string[]
 }

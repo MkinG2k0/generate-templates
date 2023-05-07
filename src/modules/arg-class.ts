@@ -4,52 +4,54 @@ interface Flags extends TFlag {
   debug?: string | true
 }
 
-interface DataArg {
+export interface DataArg {
   flags: Flags
-  otherOption: string[]
+  pathConfig: string
+  fileName: string[]
   paths: string[]
+  typeTemplate: string[]
 }
 
 interface TArg {
-  args: string[]
   data: DataArg
 }
 
 export class Arg implements TArg {
   data: DataArg = {
+    pathConfig: '',
     flags: {},
-    otherOption: [],
+    typeTemplate: [],
+    fileName: [],
     paths: [],
   }
-
-  constructor(public args: string[]) {
+  constructor(private args: string[]) {
     this.split()
   }
 
   private split() {
-    const [_node, _path, ...options] = this.args
+    const [_node, _path, pathConfig, ...options] = this.args
 
-    const isFlags: [string, string | true][] = []
-    const paths: string[] = []
-    const otherOption: string[] = []
+    this.data.pathConfig = pathConfig
 
-    options.filter((value, index, array) => {
+    let findName = false
+
+    options.map((value, index, array) => {
+      if (!value) return
+
       if (value.includes('--')) {
-        isFlags.push([value, array[index + 1] || true])
+        const name = value.slice(2)
+        this.data.flags[name] = true
       } else if (value.includes('/')) {
-        paths.push(value)
+        this.data.paths.push(value)
+      } else if (value.includes(':')) {
+        findName = true
       } else {
-        otherOption.push(value)
+        if (!findName) {
+          this.data.typeTemplate.push(value)
+        } else {
+          this.data.fileName.push(value)
+        }
       }
     })
-
-    const arrFlags = isFlags.map(([value, nextValue]) => [value.slice(2), nextValue])
-    const flags = Object.fromEntries(arrFlags)
-
-    this.data = {
-      flags,
-      otherOption,
-      paths,
-    }
   }
 }

@@ -1,0 +1,26 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Config class > Config success 1`] = `
+{
+  "debug": true,
+  "replaceDataName": "fileName",
+  "replaceFileName": "{name}",
+  "replaceNameExt": [
+    [
+      "FileName.txt",
+      "tsx",
+    ],
+  ],
+  "templates": {
+    "comp": {
+      "generate": "generated/Components",
+      "template": "templates/comp",
+    },
+    "page": {
+      "generate": "generated/Pages/",
+      "replaceDataName": /FileName/g,
+      "template": "templates/page",
+    },
+  },
+}
+`;

@@ -1,11 +1,5 @@
 #!/usr/bin/env node
 
-import { Config } from '../src/modules/config-class.js'
+import { Main } from '../src/modules/main-class.js'
 
-// const main = new Generate({
-//   pathConfig: generatePath,
-//   files: fileNames,
-//   templateName,
-// })
-
-new Config(process.argv)
+new Main(process)

@@ -1,0 +1,15 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`ReadTemplates class > ReadTemplates args 1`] = `
+[
+  {
+    "generate": "generated/Pages/",
+    "replaceDataName": /FileName/g,
+    "template": "templates/page",
+  },
+  {
+    "generate": "generated/Components",
+    "template": "templates/comp",
+  },
+]
+`;
