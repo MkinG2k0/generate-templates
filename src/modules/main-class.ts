@@ -24,7 +24,7 @@ export class Main {
     const dataTemplates = template.map(async (data) => {
       if (!data) return
 
-      return await generateTemplate.write(data.generate)
+      return await generateTemplate.write(data)
     })
 
     const data = await Promise.all(dataTemplates)

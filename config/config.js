@@ -8,12 +8,13 @@ const config = {
     },
     comp: {
       template: 'templates/comp',
-      generate: 'generated/Components',
+      generate: 'generated/Components/',
+      replaceDataName: /FileName/g,
     },
   },
   replaceFileName: '{name}',
   replaceDataName: 'fileName',
-  // replaceExt: [['txt', 'tsx']],
+  replaceExt: [['txt', 'tsx']],
   replaceNameExt: [['FileName.txt', 'tsx']],
   debug: true,
 }

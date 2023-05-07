@@ -13,9 +13,9 @@ export class GenerateTemplate {
 
   constructor(public config: Config) {}
 
-  async write(pathToTemplate: string) {
+  async write(template: TemplateItem) {
     // Рекурсивно читаем все файлы и папки, по путю до темлейта
-    const reader = new Reader(pathToTemplate, { isRecursive: true })
+    const reader = new Reader(template.template, { isRecursive: true })
     // Ждем чтения всех файлов
     const generateData = await reader.read()
 
@@ -27,9 +27,9 @@ export class GenerateTemplate {
       // очищаем счетчик итераций
       this.clearCountIterate()
       // Записываем данные на основе имени в аргументах
-      const generatePath = nodePath.join(this.config.pathRun, pathToTemplate)
-      console.log(generatePath)
+      const generatePath = nodePath.join(this.config.pathRun, template.generate)
       // записали все данные
+      log.success(generatePath)
       return this.writeData(generateData, generatePath, name)
     })
 
