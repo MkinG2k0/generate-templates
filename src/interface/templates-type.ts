@@ -29,4 +29,6 @@ export interface Global {
   replaceNameExt?: [string, string][] // заменить расширение по имени файла
   replaceExt?: [string, string][] // заменить расширение
   debug?: boolean
+  afterCommand?: string
+  isReplaceNameFolder?: boolean
 }

@@ -20,6 +20,7 @@ interface IStructure<T extends TDataType, Data> {
 
 export interface IFile extends IStructure<'file', string> {
   fileName: string
+  pathDir: string
 }
 
 export interface IFolder extends IStructure<'folder', TData[]> {}
@@ -127,6 +128,7 @@ export class Reader implements TReader {
     obj.path = path
     obj.data = data
     if (obj.type === 'file') {
+      obj.pathDir = node_path.dirname(path).replaceAll(node_path.sep, '/')
       obj.fileName = name.concat(ext)
     }
   }

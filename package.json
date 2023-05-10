@@ -36,6 +36,7 @@
   "scripts": {
     "dev": "npx nodemon",
     "test": "vitest",
+    "lint": "eslint --fix ./src/**/*.ts*",
     "test:u": "vitest -u",
     "build": "rimraf ./build && npx tsc",
     "start": "npm run build && node build/bin/main.js /config/config.js ",

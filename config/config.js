@@ -5,10 +5,12 @@ const config = {
       generate: 'generated/Pages/',
       // replaceExt: [['txt', 'tsx']],
       replaceDataName: /FileName/g,
+      replaceNameFolder: false,
     },
     test: {
       template: 'templates/test',
       generate: 'generated/test/',
+      afterCommand: 'eslint --fix ${path_generate}**/*.ts*',
     },
     comp: {
       template: 'templates/comp',
