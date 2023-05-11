@@ -30,13 +30,19 @@ export class Main {
 
     if (!template) return
 
-    const dataTemplates = template.map(async (data) => {
-      if (!data) return
+    const dataTemplates = template.map(async (value) => {
+      if (!value) return
 
-      return await generateTemplate.write(data)
+      return await generateTemplate.write(value)
     })
 
+    //   template.map(async (data) => {
+    //   if (!data) return
+    //
+    //   return await generateTemplate.write(data)
+    // })
+
     const data = await Promise.all(dataTemplates)
-    // console.log(data)
+    return data
   }
 }

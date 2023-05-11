@@ -1,15 +1,20 @@
-type TFlag = Record<string, string | true | undefined>
+type TFlag = Record<string, Record<string, string | true | undefined>>
 
-interface Flags extends TFlag {
-  debug?: string | true
+interface Flags {
+  template: string[]
+  name: string[]
+  path: string[]
+}
+export interface ITemplate {
+  templateName: string
+  path: string
+  flag: Flags
+  names: string[]
 }
 
 export interface DataArg {
-  flags: Flags
   pathConfig: string
-  fileName: string[]
-  paths: string[]
-  typeTemplate: string[]
+  templates: (ITemplate | undefined)[]
 }
 
 interface TArg {
@@ -19,10 +24,7 @@ interface TArg {
 export class Arg implements TArg {
   data: DataArg = {
     pathConfig: '',
-    flags: {},
-    typeTemplate: [],
-    fileName: [],
-    paths: [],
+    templates: [],
   }
   constructor(private args: string[]) {
     this.split()
@@ -33,25 +35,51 @@ export class Arg implements TArg {
 
     this.data.pathConfig = pathConfig
 
-    let findName = false
+    const splitTemplates = options
+      .join(' ')
+      .split(',')
+      .map((value) =>
+        value
+          .split(' ')
+          .map((value) => value.trim())
+          .filter((value) => value),
+      )
 
-    options.map((value, index, array) => {
-      if (!value) return
+    const data =
+      splitTemplates.map((value) => {
+        const [template, ...other] = value
+        if (!template) return
 
-      if (value.includes('--')) {
-        const name = value.slice(2)
-        this.data.flags[name] = true
-      } else if (value.includes('/')) {
-        this.data.paths.push(value)
-      } else if (value.includes(':')) {
-        findName = true
-      } else {
-        if (!findName) {
-          this.data.typeTemplate.push(value)
-        } else {
-          this.data.fileName.push(value)
+        const flag: Flags = {
+          template: [],
+          name: [],
+          path: [],
         }
-      }
-    })
+
+        const names: string[] = []
+        let path = ''
+
+        other.map((value) => {
+          if (value.includes('--')) {
+            const slicedValue = value.slice(2)
+            if (names.length === 0) {
+              flag.template.push(slicedValue)
+            } else if (!path) {
+              flag.name.push(slicedValue)
+            } else {
+              flag.path.push(slicedValue)
+            }
+          } else if (value.includes('/')) {
+            path = value
+          } else {
+            names.push(value)
+          }
+        })
+        const dataTemplate: ITemplate = { templateName: template, flag, names, path }
+        return dataTemplate
+      }) || []
+
+    this.data.templates = data
+    return data
   }
 }

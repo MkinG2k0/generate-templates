@@ -79,7 +79,6 @@ export class Reader implements TReader {
 
   async read(): Promise<TData | undefined> {
     const isExist = await Reader.isExists(this.path)
-
     if (!isExist) {
       console.error(`Not found path "${this.path}"`)
       return this.data

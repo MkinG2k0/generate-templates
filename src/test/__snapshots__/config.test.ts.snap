@@ -5,30 +5,21 @@ exports[`Config class > Config error path 1`] = `{}`;
 exports[`Config class > Config success 1`] = `
 {
   "debug": true,
-  "replaceDataName": "fileName",
-  "replaceExt": [
-    [
-      "txt",
-      "tsx",
-    ],
-  ],
-  "replaceFileName": "{name}",
-  "replaceNameExt": [
-    [
-      "FileName.txt",
-      "tsx",
-    ],
-  ],
+  "isReplaceNameFolder": true,
   "templates": {
     "comp": {
       "generate": "generated/Components/",
-      "replaceDataName": /FileName/g,
       "template": "templates/comp",
     },
     "page": {
       "generate": "generated/Pages/",
-      "replaceDataName": /FileName/g,
+      "replaceNameFolder": false,
       "template": "templates/page",
+    },
+    "test": {
+      "afterCommand": "eslint --fix \${path_generate}**/*.ts*",
+      "generate": "generated/test/",
+      "template": "templates/test",
     },
   },
 }

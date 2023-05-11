@@ -3,15 +3,32 @@ import { Arg } from '../modules/arg-class.js'
 import { mockArgs } from './mock/args.js'
 
 describe('Arg class', () => {
+  const arg = new Arg(mockArgs)
   test('Read args', () => {
-    const arg = new Arg(mockArgs)
-
     expect(arg.data).toMatchObject({
       pathConfig: '/config/config.js',
-      flags: { 'flag-template': true, 'flag-name': true, 'flag-path': true },
-      typeTemplate: ['template-1', 'template-2'],
-      fileName: ['name-1', 'name-2', 'name-space'],
-      paths: ['./path-to-name-1', './path/to/name/2'],
+      templates: [
+        {
+          templateName: 'tempName',
+          flag: {
+            template: ['flagTemplate'],
+            name: ['flagName'],
+            path: ['flagPath'],
+          },
+          names: ['nameGenerate', 'nameGenerate-2'],
+          path: './pathTo/',
+        },
+        {
+          templateName: 'tempName2',
+          flag: {
+            template: ['flagTemplate'],
+            name: ['flagName'],
+            path: ['flagPath'],
+          },
+          names: ['nameGenerate', 'nameGenerate-2'],
+          path: './pathTo/',
+        },
+      ],
     })
   })
 })

@@ -1,4 +1,3 @@
-import { FILE_NAME } from '../constant/const.js'
 import { regExp } from '../constant/reg-exp.js'
 import { IConfig, TemplateItem } from '../interface/templates-type.js'
 import { Arg } from './arg-class.js'
@@ -18,30 +17,6 @@ export class GenerateData {
 
   setLocalConfig(localConfig: TemplateItem) {
     this.localConfig = localConfig
-  }
-
-  replaceName(data: TData, generateName: string) {
-    const { ext, type, name } = data
-    if (type === 'file') {
-      // ищем в локальном или в глобальном конфиге на что заменять расширения
-      const isReplaceExt = this.getLocalOrGlobalConfig((conf) => conf.replaceExt)
-      // ищем какое имя файла заменить если не нашли используем константу
-      const replaceFileName =
-        this.getLocalOrGlobalConfig((conf) => conf.replaceFileName) || FILE_NAME
-
-      const replacedName = name.replace(replaceFileName, generateName)
-      // если расширение в конфиге совпадаем с текущим файлом
-      const findReplacedExt = isReplaceExt?.find(([replaceable, replace]) => {
-        return replaceable === ext
-      })
-      // если нашли расширение, прибавляем его к названию файла,
-      // в противном случае прибавляем расширение прочитанного файла template
-      const fileName = findReplacedExt
-        ? `${replacedName}.${findReplacedExt[1]}`
-        : `${replacedName}.${ext}`
-      return fileName
-    }
-    return data.name
   }
 
   replaceDataFile(data: TData, name: string) {
@@ -127,18 +102,22 @@ export class GenerateData {
     }
   }
   // TODO сделать лучше
-  addComments(allComments: string[]) {
-    return [...allComments, '/*${path_to_generate}*/', '/*${path_to_folder}*/', '/*${name}*/']
+  private addComments(allComments: string[]) {
+    return [...allComments, '/*${path_to_generate}*/', '/*${name}*/']
   }
 
   // TODO сделать лучше
-  addVariable(otherCode: IBlockCode[], data: IFile, name: string) {
+  private addVariable(otherCode: IBlockCode[], data: IFile, name: string) {
     const code: IBlockCode[] = [...otherCode]
     code.push({ data: '', code: this.localConfig.generate, name: '${path_to_generate}', ext: '' })
-    code.push({ data: '', code: data.pathDir, name: '${path_to_folder}', ext: '' })
     code.push({ data: '', code: name, name: '${name}', ext: '' })
+    // code.push({ data: '', code: data.pathDir, name: '${path_to_folder}', ext: '' })
 
     return code
+  }
+
+  replaceName(writeData: TData, generateName: string) {
+    return writeData.name.replace('${name}', generateName)
   }
 
   private getLocalOrGlobalConfig<T>(

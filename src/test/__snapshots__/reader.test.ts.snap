@@ -10,6 +10,7 @@ exports[`Reader class > Reader isRecursive:false 1`] = `
       "fileName": "test-file.txt",
       "name": "test-file",
       "path": "src\\\\test\\\\mock\\\\folder\\\\test-file.txt",
+      "pathDir": "src/test/mock/folder",
       "type": "file",
     },
     {
@@ -37,6 +38,7 @@ exports[`Reader class > Reader isRecursive:false path:'./src/test/' 1`] = `
       "fileName": "test-file.txt",
       "name": "test-file",
       "path": "src\\\\test\\\\mock\\\\folder\\\\test-file.txt",
+      "pathDir": "src/test/mock/folder",
       "type": "file",
     },
     {
@@ -64,6 +66,7 @@ exports[`Reader class > Reader isRecursive:true 1`] = `
       "fileName": "test-file.txt",
       "name": "test-file",
       "path": "src\\\\test\\\\mock\\\\folder\\\\test-file.txt",
+      "pathDir": "src/test/mock/folder",
       "type": "file",
     },
     {
@@ -75,6 +78,7 @@ exports[`Reader class > Reader isRecursive:true 1`] = `
           "fileName": "inherit.txt",
           "name": "inherit",
           "path": "src\\\\test\\\\mock\\\\folder\\\\test-folder\\\\inherit.txt",
+          "pathDir": "src/test/mock/folder/test-folder",
           "type": "file",
         },
       ],

@@ -3,14 +3,24 @@
 exports[`ReadTemplates class > ReadTemplates args 1`] = `
 [
   {
-    "generate": "generated/Pages/",
-    "replaceDataName": /FileName/g,
-    "template": "templates/page",
-  },
-  {
-    "generate": "generated/Components/",
-    "replaceDataName": /FileName/g,
-    "template": "templates/comp",
+    "localConfig": {
+      "generate": "generated/Pages/",
+      "replaceNameFolder": false,
+      "template": "templates/page",
+    },
+    "template": {
+      "flag": {
+        "name": [],
+        "path": [],
+        "template": [],
+      },
+      "names": [
+        "Main",
+        "Auth",
+      ],
+      "path": "",
+      "templateName": "page",
+    },
   },
 ]
 `;

@@ -4,7 +4,6 @@
 /// ${with-type}[1]
 /// ${with-style}[1]
 import file from '/*${path_to_generate}*/'
-import folder from '/*${path_to_folder}*/'
 
 /// ${with-type}[2]
 
