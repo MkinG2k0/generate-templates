@@ -1,6 +1,7 @@
 import { regExp } from '../constant/reg-exp.js'
 import { IConfig, TemplateItem } from '../interface/templates-type.js'
-import { Arg } from './arg-class.js'
+import { Arg, ITemplate } from './arg-class.js'
+import { Case } from './case-class.js'
 import { Config } from './config-class.js'
 import { IFile, TData } from './reader-class.js'
 
@@ -8,15 +9,16 @@ interface IBlockCode {
   name: string
   ext: string
   code: string
-  data?: string
 }
 
 export class GenerateData {
   private localConfig: TemplateItem = { generate: '', template: '' }
+  private template?: ITemplate
   constructor(public config: Config, public arg: Arg) {}
 
-  setLocalConfig(localConfig: TemplateItem) {
+  setLocalConfig(localConfig: TemplateItem, template: ITemplate) {
     this.localConfig = localConfig
+    this.template = template
   }
 
   replaceDataFile(data: TData, name: string) {
@@ -63,7 +65,7 @@ export class GenerateData {
 
       const data: IBlockCode = {
         name,
-        ext,
+        ext: ext.trim(),
         code: codeStr,
       }
 
@@ -73,27 +75,51 @@ export class GenerateData {
     return codes
   }
 
-  private parseData(data: IFile, name: string) {
+  private parseData(data: IFile, nameData: string) {
     const [someCode, ...otherCode] = this.getCode(data.data)
 
     if (!someCode) return { data: data.data, ext: data.ext }
 
     const strCode = someCode.code
+    // ищем комментарии в коде /**/
     const comments = Array.from(strCode.match(regExp.commentsLine) || [])
+    // ищем комментарии в коде ///
     const commentsLine = Array.from(strCode.match(/\/\/\/.*/g) || [])
-    const allComments = this.addComments([...comments, ...commentsLine])
+    // объединяем два вида комментариев /**/ и ///
+    const allComments = [...comments, ...commentsLine]
+    // переменная для сгенерированных данных
     let newData: string = strCode
-    const allCode: IBlockCode[] = this.addVariable(otherCode, data, name)
+    // получение дефолтных блоков кода
+    const defaultVariable = this.defaultCodeBlock(nameData)
+    // получаем все флаги
+    const { template, name, path } = this.template!.flag
+    // объединяем их
+    const flags = [...template, ...name, ...path]
 
-    allCode.map((code) => {
-      if (!code) return
-      allComments.map((name) => {
-        const checkName = name.replaceAll('/', '').replaceAll('*', '').trim()
-        // TODO isTrue
-        if (checkName === code.name.trim()) {
-          newData = newData.replaceAll(name, code?.code || '')
-        }
+    flags.forEach((flagName) => {
+      otherCode.forEach((code) => {
+        if (!code) return
+        allComments.forEach((name) => {
+          const checkName = name.replaceAll('/', '').replaceAll('*', '').trim()
+          const clearCheckName = checkName.slice(
+            checkName.indexOf('$') + 1,
+            checkName.lastIndexOf('$'),
+          )
+          const onFlag = flagName === clearCheckName
+          const codeName = code.name.trim()
+          if (onFlag && checkName === codeName) {
+            newData = newData.replaceAll(name, code?.code || '')
+          }
+        })
       })
+    })
+
+    defaultVariable.forEach(({ name, code }) => {
+      newData = newData.replaceAll(name, code)
+    })
+    // заменяем статичные данные
+    this.getDefaultComments().forEach((name) => {
+      newData = newData.replaceAll(name, '')
     })
 
     return {
@@ -102,22 +128,22 @@ export class GenerateData {
     }
   }
   // TODO сделать лучше
-  private addComments(allComments: string[]) {
-    return [...allComments, '/*${path_to_generate}*/', '/*${name}*/']
+  private getDefaultComments() {
+    return ['$pathToGenerate$', '$name$', '$nameCamel$', '$nameUpCamel$']
   }
 
   // TODO сделать лучше
-  private addVariable(otherCode: IBlockCode[], data: IFile, name: string) {
-    const code: IBlockCode[] = [...otherCode]
-    code.push({ data: '', code: this.localConfig.generate, name: '${path_to_generate}', ext: '' })
-    code.push({ data: '', code: name, name: '${name}', ext: '' })
-    // code.push({ data: '', code: data.pathDir, name: '${path_to_folder}', ext: '' })
-
+  private defaultCodeBlock(name: string) {
+    const code: IBlockCode[] = []
+    code.push({ code: this.localConfig.generate, name: '$pathToGenerate$', ext: '' })
+    code.push({ code: name, name: '$name$', ext: '' })
+    code.push({ code: Case.write(name, 'lowerCamel'), name: '$nameCamel$', ext: '' })
+    code.push({ code: Case.write(name, 'camel'), name: '$nameUpCamel$', ext: '' })
     return code
   }
 
   replaceName(writeData: TData, generateName: string) {
-    return writeData.name.replace('${name}', generateName)
+    return writeData.name.replace('$name$', generateName)
   }
 
   private getLocalOrGlobalConfig<T>(

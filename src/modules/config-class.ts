@@ -18,6 +18,7 @@ export class Config implements TConfig {
     }
     const reader = new Reader(this.args.pathConfig, { path: this.pathRun })
     const data = await reader.read()
+
     if (data) {
       this.globalConfig = (await Parser.parse(data)) as IConfig
       log.setDebug(log.debug || this.globalConfig.debug)

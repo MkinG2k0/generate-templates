@@ -2,4 +2,5 @@
 
 import { Main } from '../src/modules/main-class.js'
 
-new Main(process)
+const main = new Main(process)
+main.read()

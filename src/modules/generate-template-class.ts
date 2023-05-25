@@ -1,5 +1,6 @@
 import { exec } from 'child_process'
 import fs from 'node:fs/promises'
+import node_path from 'path'
 import nodePath from 'path'
 import { TemplateItem } from '../interface/templates-type.js'
 import { Config } from '../modules/config-class.js'
@@ -11,7 +12,6 @@ import { Reader, TData } from './reader-class.js'
 export class GenerateTemplate {
   private countIterate = 0
   private generateData?: GenerateData
-
   constructor(public config: Config) {}
 
   setGenerateData(arg: Arg) {
@@ -32,44 +32,51 @@ export class GenerateTemplate {
     // Читаем все имена файлов из аргументов
     const writeDataArr = template.names.map(async (name) => {
       // записываем локальный конфиг для генерации имени и данных
-      this.generateData?.setLocalConfig(localConfig)
+      this.generateData?.setLocalConfig(localConfig, template)
       // очищаем счетчик итераций
       this.clearCountIterate()
       // Записываем данные на основе имени в аргументах
-      // TODO relative path
-      // console.log(generateData, name, localConfig)
-      // const generatePath = nodePath.join(this.config.pathRun, localConfig.generate)
       const path = localConfig.generate
 
-      const data = await this.writeData(localConfig, generateData, name, path)
-      // записали все данные
-      // log.success(`${name}: ${generatePath}`)
-      //afterCommand
-      this.runCommand(localConfig)
+      const data = await this.writeData(localConfig, generateData, template, name, path)
+
+      log.success(`${name}: ${path}`)
+
       return data
     })
 
-    if (!writeDataArr) return
+    if (!writeDataArr) return false
     await Promise.all(writeDataArr)
+    await this.runCommand(localConfig)
     return true
   }
 
-  private runCommand(localConfig: TemplateItem) {
-    let command = localConfig.afterCommand || this.config.globalConfig.afterCommand
+  private async runCommand(localConfig: TemplateItem) {
+    let command = localConfig.afterCommand || this.config.globalConfig.afterCommand || ''
     command = command?.replace('${path_generate}', localConfig.generate)
-    if (command) {
-      exec(command)
-    }
+
+    const result = new Promise((resolve) => {
+      if (command) {
+        log.log(`run command: "${command}"`)
+        exec(command, (error, stdout, stderr) => {
+          resolve(stdout)
+        })
+      } else {
+        resolve(true)
+      }
+    })
+
+    return result
   }
 
   private async writeData(
     localConfig: TemplateItem,
     writeData: TData,
+    template: ITemplate,
     generateName: string,
     path: string = '',
   ) {
     const { type } = writeData
-    const { generate } = localConfig
     // увеличиваем счетчик итераций
     this.incCountIterate()
     // генерируем новое имя файла или паки
@@ -78,27 +85,26 @@ export class GenerateTemplate {
     if (type === 'file') {
       // const newPath = nodePath.join(generatePath, generateName)
       await this.createFile(writeData, generateName, path, newName)
+      // записали все данные
     } else {
-      // TODO сделать чтобы эту опцию можно было выбирать в конфиге
-      // TODO заменять ли выбраным именем корневую папку генерации
       // берем из конфига заменять ли коревую папку генерации
       let isReplaceNameFolderConfig = Boolean(
         localConfig.isReplaceNameFolder || this.config.globalConfig.isReplaceNameFolder,
       )
+      const pathInGenerate = template.path
       // если это первая итерация и в конфиге указано то-что папку заменяем,
       // то название папки будет соответствовать имени в конфиге
       const isReplaceNameFolder = isReplaceNameFolderConfig && this.countIterate === 1
       const rootFolder = nodePath.parse(writeData.path).name
       const name = isReplaceNameFolder ? generateName : rootFolder
-      const newPath = nodePath.join(path, name)
-
+      const newPath = nodePath.join(path, pathInGenerate, name)
       // TODO рекурсивно создавать если папок нет
       // создаем текущую папку
       await this.createFolder(newPath)
       // проходимся по файлам находящимся внутри папки
       writeData.data.map(async (nextData) => {
         // рекурсивно их читаем
-        await this.writeData(localConfig, nextData, generateName, newPath)
+        await this.writeData(localConfig, nextData, template, generateName, newPath)
       })
     }
   }
@@ -111,20 +117,25 @@ export class GenerateTemplate {
     this.countIterate++
   }
 
-  private async createFolder(path: string) {
+  private async createFolder(path: string, errPath = '') {
+    console.log(path)
     await fs.mkdir(path).catch((reason) => {
+      const newErrPath = node_path.parse(path).dir
+      console.log(newErrPath)
       // log.warn(`Error create folder in path "${path}"`).view(reason)
+      this.createFolder(path, newErrPath)
     })
   }
-
+  // /path/some/err/
+  // /path/some/
+  // /path/
   private async createFile(data: TData, generateName: string, path: string, newName: string) {
     if (data.type === 'file') {
       const replacedData = this.generateData!.replaceDataFile(data, generateName)
       const newPath = nodePath.join(path, newName.concat('.').concat(replacedData.ext))
 
       return await fs.writeFile(newPath, replacedData.data).catch((reason) => {
-        log.error(`Error create file in path ${data.path}`)
-        // .view(reason)
+        log.error(`Error create file in path ${data.path}`).view(reason)
       })
     }
   }

@@ -36,12 +36,6 @@ export class Main {
       return await generateTemplate.write(value)
     })
 
-    //   template.map(async (data) => {
-    //   if (!data) return
-    //
-    //   return await generateTemplate.write(data)
-    // })
-
     const data = await Promise.all(dataTemplates)
     return data
   }

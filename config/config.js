@@ -1,4 +1,4 @@
-const config = {
+module.exports = {
   templates: {
     page: {
       template: 'templates/page',
@@ -8,7 +8,7 @@ const config = {
     test: {
       template: 'templates/test',
       generate: 'generated/test/',
-      afterCommand: 'eslint --fix ${path_generate}**/*.ts*',
+      afterCommand: 'eslint --fix ./${path_generate}**/*.ts*',
     },
     comp: {
       template: 'templates/comp',
@@ -18,5 +18,3 @@ const config = {
   debug: true,
   isReplaceNameFolder: true,
 }
-
-export default config
