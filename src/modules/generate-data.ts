@@ -118,7 +118,7 @@ export class GenerateData {
       newData = newData.replaceAll(name, code)
     })
     // заменяем статичные данные
-    this.getDefaultComments().forEach((name) => {
+    allComments.forEach((name) => {
       newData = newData.replaceAll(name, '')
     })
 

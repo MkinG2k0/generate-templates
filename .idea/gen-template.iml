@@ -9,6 +9,7 @@
       <excludeFolder url="file://$MODULE_DIR$/generated/Pages" />
       <excludeFolder url="file://$MODULE_DIR$/generated/Components" />
       <excludeFolder url="file://$MODULE_DIR$/generated/test" />
+      <excludeFolder url="file://$MODULE_DIR$/generated" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

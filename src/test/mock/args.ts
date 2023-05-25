@@ -10,8 +10,7 @@ export const realTestArgs =
   '_node _path /config/config.js test --type newName --style new-name-2 --flag-name-2 ./path --flag-path, page --flag-page newPage --flag-comp-page'.split(
     ' ',
   )
-// --type
-//
+
 export const failedArgs = '_node _path /another_path/config.js page comp name: Main Auth '.split(
   ' ',
 )
