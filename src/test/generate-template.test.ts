@@ -11,6 +11,7 @@ describe('Template class', async () => {
   await config.read()
   const template = new GenerateTemplate(config)
   template.setGenerateData(arg)
+
   test('Template args', async () => {
     const data = await template.write({
       localConfig: {
@@ -30,5 +31,12 @@ describe('Template class', async () => {
     })
 
     expect(data).toBeTruthy()
+  })
+
+  test('Template create folder', async () => {
+    const template = new GenerateTemplate(config)
+    template.setGenerateData(arg)
+
+    await template.createFolder('./generated/test/a/d')
   })
 })

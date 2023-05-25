@@ -1,6 +1,5 @@
 import { exec } from 'child_process'
 import fs from 'node:fs/promises'
-import node_path from 'path'
 import nodePath from 'path'
 import { TemplateItem } from '../interface/templates-type.js'
 import { Config } from '../modules/config-class.js'
@@ -36,7 +35,7 @@ export class GenerateTemplate {
       // очищаем счетчик итераций
       this.clearCountIterate()
       // Записываем данные на основе имени в аргументах
-      const path = localConfig.generate
+      const path = nodePath.join(localConfig.generate, template.path)
 
       const data = await this.writeData(localConfig, generateData, template, name, path)
 
@@ -91,14 +90,12 @@ export class GenerateTemplate {
       let isReplaceNameFolderConfig = Boolean(
         localConfig.isReplaceNameFolder || this.config.globalConfig.isReplaceNameFolder,
       )
-      const pathInGenerate = template.path
       // если это первая итерация и в конфиге указано то-что папку заменяем,
       // то название папки будет соответствовать имени в конфиге
       const isReplaceNameFolder = isReplaceNameFolderConfig && this.countIterate === 1
       const rootFolder = nodePath.parse(writeData.path).name
       const name = isReplaceNameFolder ? generateName : rootFolder
-      const newPath = nodePath.join(path, pathInGenerate, name)
-      // TODO рекурсивно создавать если папок нет
+      const newPath = nodePath.join(path, name)
       // создаем текущую папку
       await this.createFolder(newPath)
       // проходимся по файлам находящимся внутри папки
@@ -117,18 +114,12 @@ export class GenerateTemplate {
     this.countIterate++
   }
 
-  private async createFolder(path: string, errPath = '') {
-    console.log(path)
-    await fs.mkdir(path).catch((reason) => {
-      const newErrPath = node_path.parse(path).dir
-      console.log(newErrPath)
-      // log.warn(`Error create folder in path "${path}"`).view(reason)
-      this.createFolder(path, newErrPath)
+  async createFolder(path: string) {
+    await fs.mkdir(path, { recursive: true }).catch(async (reason) => {
+      log.warn(`Error create folder in path "${path}"`).view(reason)
     })
   }
-  // /path/some/err/
-  // /path/some/
-  // /path/
+
   private async createFile(data: TData, generateName: string, path: string, newName: string) {
     if (data.type === 'file') {
       const replacedData = this.generateData!.replaceDataFile(data, generateName)
