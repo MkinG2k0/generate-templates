@@ -10,7 +10,7 @@ interface IBlockCode {
   ext: string
   code: string
 }
-
+const charStartBlock = '###'
 export class GenerateData {
   private localConfig: TemplateItem = { generate: '', template: '' }
   private template?: ITemplate

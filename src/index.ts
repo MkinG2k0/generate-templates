@@ -1,1 +1,2 @@
-export { IConfig } from './interface/templates-type.js'
+export * from './modules/index.js'
+export * from './interface/templates-type.js'

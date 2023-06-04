@@ -6,6 +6,6 @@
   "ignore": [
     "./src/test"
   ],
-  "exec": "npx ts-node ./bin/main.ts /config/config.js page name: Generate-File-Name2 ./path /path2 --option"
+  "exec": "npx ts-node ./bin/main.ts split --separator=/ a/b/c"
 }
 

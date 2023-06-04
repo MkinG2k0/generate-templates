@@ -52,6 +52,7 @@ export class Reader implements TReader {
 
   constructor(public path: string, public params?: TReaderParams) {
     this.path = params?.path ? node_path.join(params.path, path) : path
+    console.log(this.path)
   }
 
   static async isExists(path: string) {

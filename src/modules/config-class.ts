@@ -1,4 +1,4 @@
-import { IConfig } from '../index.js'
+import { IConfig } from '../interface/templates-type.js'
 import { DataArg } from './arg-class.js'
 import { log } from './logs-class.js'
 import { Parser } from './parser-class.js'

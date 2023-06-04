@@ -1,6 +1,9 @@
 #!/usr/bin/env node
 
-import { Main } from '../src/modules/main-class.js'
+import { Cli } from '../src/modules/cli.js'
 
-const main = new Main(process)
-main.read()
+// const main = new Main(process)
+// main.read()
+
+const cli = new Cli([{ title: 'вопрос', type: 'string' }])
+cli.start()
