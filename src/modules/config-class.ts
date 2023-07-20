@@ -16,6 +16,7 @@ export class Config implements TConfig {
       log.error('Choose path to config').view(this.args)
       return
     }
+
     const reader = new Reader(this.args.pathConfig, { path: this.pathRun })
     const data = await reader.read()
 

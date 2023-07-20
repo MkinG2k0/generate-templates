@@ -1,6 +1,6 @@
 {
   "name": "generate-templates",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "",
   "main": "./build/bin/main.js",
   "type": "module",
@@ -35,6 +35,7 @@
   },
   "scripts": {
     "dev": "npx nodemon",
+    "start": "pnpm build && node ./build/bin/main.js config/config2.cjs page AA",
     "test": "vitest",
     "test:u": "vitest -u",
     "lint": "eslint --fix ./src/**/*.ts*",
@@ -60,6 +61,7 @@
   },
   "dependencies": {
     "chalk": "^5.2.0",
-    "commander": "^10.0.1"
+    "commander": "^10.0.1",
+    "recursive-readdir": "^2.2.3"
   }
 }

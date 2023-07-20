@@ -27,7 +27,7 @@ export class ReadTemplates {
       // Если нашли объект то значит что темлейт найден
       if (!localConfig) {
         // Если не нашли темлейт, то бросаем ошибку
-        log.error(`Can not find config ${templateName} pls check template file`).view(template)
+        log.error(`Can not find config "${templateName}" pls check template file`).view(template)
         return
       }
 

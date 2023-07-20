@@ -14,6 +14,8 @@ export class Parser {
         return await this.parseJs(dataFile)
       } else if (ext === 'js') {
         return await this.parseJs(dataFile)
+      } else if (ext === 'cjs') {
+        return await this.parseJs(dataFile)
       } else {
         log.error(`not fount file extension ${ext}`)
         return {}

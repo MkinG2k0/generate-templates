@@ -7,7 +7,7 @@ function twoSum(nums: number[], target: number): number[] {
       const res = number + nextNumber
 
       if (res === target) {
-        return [i, a]
+        return [number, nextNumber]
       }
     }
   }
